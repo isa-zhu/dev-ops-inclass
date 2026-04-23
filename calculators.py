@@ -577,8 +577,52 @@ def calculate_pecarn(age_months, gcs, altered_mental_status,
                            preference'
            low          → 'CT scan NOT recommended'
     """
-    # TODO: Students — implement this function
-    raise NotImplementedError(
-        "calculate_pecarn() is not yet implemented. "
-        "Please implement this function according to the docstring."
-    )
+    # Validate GCS
+    if not (3 <= gcs <= 15):
+        raise ValueError("GCS must be between 3 and 15 inclusive")
+    
+    # Determine risk level based on age
+    if age_months < 24:
+        # Age < 24 months
+        if gcs < 15 or palpable_skull_fracture or altered_mental_status:
+            risk_level = 'high'
+        elif (loss_of_consciousness or 
+              scalp_hematoma_location == 'non-frontal' or 
+              severe_mechanism or 
+              vomiting):
+            risk_level = 'intermediate'
+        else:
+            risk_level = 'low'
+    else:
+        # Age >= 24 months
+        if gcs < 15 or signs_basal_skull_fracture or altered_mental_status:
+            risk_level = 'high'
+        elif (loss_of_consciousness or 
+              vomiting or 
+              severe_mechanism or 
+              severe_headache):
+            risk_level = 'intermediate'
+        else:
+            risk_level = 'low'
+    
+    # Set recommendation and interpretation based on risk level
+    if risk_level == 'high':
+        recommendation = 'CT scan recommended'
+        interpretation = 'High risk of clinically important traumatic brain injury (ciTBI). CT scan recommended.'
+    elif risk_level == 'intermediate':
+        recommendation = ('CT scan versus observation: individualise based on '
+                         'physician experience, multiple vs isolated findings, '
+                         'worsening symptoms, age < 3 months, parental preference')
+        interpretation = ('Intermediate risk of ciTBI. CT scan versus observation: '
+                         'individualise based on physician experience, multiple vs isolated findings, '
+                         'worsening symptoms, age < 3 months, and parental preference.')
+    else:  # low
+        recommendation = 'CT scan NOT recommended'
+        interpretation = ('Very low risk of ciTBI (< 0.02%). CT scan NOT recommended. '
+                         'Clinical observation may be appropriate.')
+    
+    return {
+        'risk_level': risk_level,
+        'recommendation': recommendation,
+        'interpretation': interpretation
+    }
