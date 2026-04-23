@@ -412,11 +412,32 @@ def calculate_heart_score(history, ecg, age_score, risk_factors, troponin):
       5. Return a dict containing ``'score'``, ``'risk_level'``, and
          ``'interpretation'``.
     """
-    # TODO: Students — implement this function
-    raise NotImplementedError(
-        "calculate_heart_score() is not yet implemented. "
-        "Please implement this function according to the docstring."
-    )
+    # Validate parameters
+    for param_name, param_value in [('history', history), ('ecg', ecg), 
+                                    ('age_score', age_score), ('risk_factors', risk_factors), 
+                                    ('troponin', troponin)]:
+        if not isinstance(param_value, int) or param_value not in [0, 1, 2]:
+            raise ValueError(f"{param_name} must be 0, 1, or 2")
+    
+    # Calculate total score
+    score = history + ecg + age_score + risk_factors + troponin
+    
+    # Determine risk level
+    if score <= 3:
+        risk_level = 'low'
+        interpretation = "Low risk (~1.7 % MACE) - consider early discharge"
+    elif score <= 6:
+        risk_level = 'moderate'
+        interpretation = "Moderate risk (~12 % MACE) - observe; serial troponins"
+    else:
+        risk_level = 'high'
+        interpretation = "High risk (~65 % MACE) - early invasive strategy"
+    
+    return {
+        'score': score,
+        'risk_level': risk_level,
+        'interpretation': interpretation
+    }
 
 
 # =============================================================================
